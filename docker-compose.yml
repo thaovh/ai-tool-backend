@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-tool-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - API_VERSION=v1
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=t12345678
+      - DB_DATABASE=ai_train_tool
+      - JWT_SECRET=your-super-secret-key-here
+      - JWT_EXPIRATION=1h
+      - JWT_REFRESH_SECRET=your-super-secret-refresh-key-here
+      - JWT_REFRESH_EXPIRATION=7d
+      - LOG_LEVEL=info
+    networks:
+      - ai-tool-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ai-tool-postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=t12345678
+      - POSTGRES_DB=ai_train_tool
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - ai-tool-network
+
+networks:
+  ai-tool-network:
+    driver: bridge
+
+volumes:
+  postgres-data: 
