@@ -2,7 +2,6 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { User } from '../../entities/user.entity';
 import { UpdateUserCommand } from '../update-user.command';
 
@@ -11,7 +10,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async execute(command: UpdateUserCommand): Promise<User> {
     const { id, updateUserDto } = command;
@@ -22,10 +21,6 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
 
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
     }
 
     if (updateUserDto.email || updateUserDto.phoneNumber) {

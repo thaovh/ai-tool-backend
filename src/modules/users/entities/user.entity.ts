@@ -1,4 +1,5 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 export enum UserRole {
@@ -13,6 +14,9 @@ export enum UserStatus {
 
 @Entity('tbl_user')
 export class User extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
   @Column({ name: 'first_name', length: 100 })
   firstName: string;
 
@@ -26,6 +30,7 @@ export class User extends BaseEntity {
   phoneNumber: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column({
@@ -43,5 +48,15 @@ export class User extends BaseEntity {
   status: UserStatus;
 
   @Column({ name: 'refresh_token', nullable: true })
+  @Exclude()
   refreshToken: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt: Date;
 }

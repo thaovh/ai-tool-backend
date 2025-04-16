@@ -1,17 +1,18 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdatePasswordDto } from '../dto/update-password.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findOne({
@@ -58,10 +59,6 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
     const user = await this.findOne(id);
 
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-    }
-
     if (updateUserDto.email || updateUserDto.phoneNumber) {
       const existingUser = await this.userRepository.findOne({
         where: [
@@ -89,5 +86,30 @@ export class UsersService {
     await this.userRepository.update(id, {
       refreshToken: hashedRefreshToken,
     });
+  }
+
+  async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto): Promise<void> {
+    const user = await this.findOne(id);
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(updatePasswordDto.currentPassword, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    // Verify new password matches confirmation
+    if (updatePasswordDto.newPassword !== updatePasswordDto.confirmPassword) {
+      throw new UnauthorizedException('New password and confirmation do not match');
+    }
+
+    // Hash and update new password
+    const hashedPassword = await bcrypt.hash(updatePasswordDto.newPassword, 10);
+    await this.userRepository.update(id, { password: hashedPassword });
+  }
+
+  async updateProfile(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findOne(id);
+    Object.assign(user, updateUserDto);
+    return this.userRepository.save(user);
   }
 }
