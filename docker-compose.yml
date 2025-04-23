@@ -8,41 +8,23 @@ services:
     container_name: ai-tool-backend
     restart: always
     ports:
-      - "3000:3000"
-    depends_on:
-      - postgres
+      - "3456:3456"
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - PORT=3456
       - API_VERSION=v1
-      - DB_HOST=postgres
+      - DB_HOST=192.168.68.234
       - DB_PORT=5432
       - DB_USERNAME=postgres
       - DB_PASSWORD=t12345678
       - DB_DATABASE=ai_train_tool
-      - JWT_SECRET=your-super-secret-key-here
+      - JWT_SECRET=79ebb489add9cf99b994c07c930203858615c72fa76f838a8de7b887d596538075acb29054c6012138b046d5c2c69d3cd5a057caf4713160b2641e32c48a1d50e2c8149842ad9fed072ff7783b87c8885b8d6058cb3cfa90c37f01dcebf71badeb89cecdc44682d7c1c548d7e32d17b2cebcb94652685a8ac7291c82937e47c7
       - JWT_EXPIRATION=1h
-      - JWT_REFRESH_SECRET=your-super-secret-refresh-key-here
+      - JWT_REFRESH_SECRET=a313d2f7655272e53a7f0bfc96da52a65757bd6382af0a8f188aa8963c62872d6a96f23296a53d7e9bd61b02857204690db6fd9e1dba91efee526ce6e031625d03e37d773c186713f4b5cd542b6359f9e1838ac784d8ede5e5d17b586b320124484421d8e00b2702c6cb6543df616ba15fa2ecabb4f429be51b8789578e96cba
       - JWT_REFRESH_EXPIRATION=7d
       - LOG_LEVEL=info
     networks:
       - ai-tool-network
-
-  postgres:
-    image: postgres:15-alpine
-    container_name: ai-tool-postgres
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=t12345678
-      - POSTGRES_DB=ai_train_tool
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - ai-tool-network
-
 networks:
   ai-tool-network:
     driver: bridge

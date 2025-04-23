@@ -6,6 +6,7 @@ import { UsersModule } from './modules/users/users.module';
 import { FineTuneModule } from './modules/fine-tune/fine-tune.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { RawQueryModule } from './modules/raw-query/raw-query.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { HealthModule } from './modules/health/health.module';
     FineTuneModule,
     AuthModule,
     HealthModule,
+    RawQueryModule,
   ],
 })
 export class AppModule {}
